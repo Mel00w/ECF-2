@@ -1,20 +1,23 @@
 <?php
 session_start();
 include_once './connexion.php';
-$req = $bdd->query('SELECT post.`id_post`, post.`date_published`, post.`title`, post.`under_title`, post.`intro`, post.`contain`, post.`pic`, post.`id_user`, user.`id_user`, user.`username` , `user`.`profile_picture`, `user`.`password`, `user`.`email` FROM `post` INNER JOIN `user` ON post.`id_user` = user.`id_user`;');
-$user = $bdd->query('SELECT `id_user`, `username`, `profile_picture`, `email`, `password` FROM `user` WHERE `id_user`;')->fetch(PDO::FETCH_ASSOC);
+$req = $bdd->query('SELECT post.`id_post`, post.`date_published`, post.`title`, post.`under_title`, post.`intro`, post.`contain`, post.`pic`, post.`id_user`, user.`id_user`, user.`username` , `user`.`profile_picture`, `user`.`password`, `user`.`email` FROM `post` INNER JOIN `user` ON post.`id_user` = user.`id_user` ORDER BY post.`date_published` DESC;');
+$user = $bdd->prepare('SELECT `id_user`, `username`, `profile_picture`, `email`, `password` FROM `user` WHERE `id_user`= :id;');
+$user->bindParam("id", $_SESSION['id_user'], PDO::PARAM_INT);
+$user->execute();
+$user = $user->fetch(PDO::FETCH_ASSOC);
 // Vérifier si un utilisateur est connecté
 $isConnected = isset($_SESSION['id_user']); // Vérifie si l'ID utilisateur est stocké dans la session
 $username = $isConnected ? $_SESSION['username'] : null; // Récupère le nom d'utilisateur de la session s'il est connecté
 ?>
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
-    <title>SkyDiary | Home </title>
+    <title>SkyDiary | Home</title>
     <link rel="stylesheet" href="./css/style.css">
     <meta name="description" content="SkyDiary est une plateforme de blog en ligne.">
 </head>
@@ -32,11 +35,13 @@ $username = $isConnected ? $_SESSION['username'] : null; // Récupère le nom d'
             <div class="collapse navbar-collapse" id="navbarSupportedContent">
                 <ul class="navbar-nav me-auto mb-2 mb-lg-0">
                     <?php if ($isConnected): ?>
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="./profile.php">
-                                Welcome <?= htmlspecialchars($username) ?>
-                            </a>
-                        </li>
+                    <li class="nav-item"></li>
+                        <a class="nav-link active" aria-current="page" href="./profile.php">
+                         
+                              <img src="<?= htmlspecialchars($user['profile_picture']) ?>" alt="Profile Picture" style="width: 30px; height: 30px; border-radius: 50%;">
+                                  <?= htmlspecialchars($username) ?>
+                        </a>
+                    </li>
                     <?php else: ?>
                         <li class="nav-item">
                             <a class="nav-link active" aria-current="page" href="./login.php">
@@ -61,7 +66,8 @@ $username = $isConnected ? $_SESSION['username'] : null; // Récupère le nom d'
     </nav>
 </header>
 
-    <main>
+<main>
+    <?php if ($isConnected): ?>
         <article>
             <p>Engage with ideas that spark change and creativity. Stay informed on what's shaping the world around you. Discover the stories that fuel inspiration and connection</p>
         </article>
@@ -70,7 +76,7 @@ $username = $isConnected ? $_SESSION['username'] : null; // Récupère le nom d'
                 <p><img src="<?= htmlspecialchars($user['profile_picture']) ?>" alt="Photo de profil"> <?= htmlspecialchars($user['username']) ?></p>
             </div>
             <?php
-            // Affichage des deux premiers articles
+            // Affichage des deux derniers articles
             $counter = 0;
             $latestPostsDisplayed = false;
             while ($article = $req->fetch(PDO::FETCH_ASSOC)) {
@@ -86,7 +92,7 @@ $username = $isConnected ? $_SESSION['username'] : null; // Récupère le nom d'
                 } else {
                     if (!$latestPostsDisplayed) {
                     ?>
-                        <h2>Oldest Posts</h2>
+                        <h2>Articles plus anciens</h2>
                     <?php
                         $latestPostsDisplayed = true; // Marque le H2 comme affiché
                     }
@@ -101,16 +107,11 @@ $username = $isConnected ? $_SESSION['username'] : null; // Récupère le nom d'
             }
             ?>
         </article>
-        <article>
-            <p>Engage with ideas that spark change and creativity. Stay informed on what's shaping the world around you. Discover the stories that fuel inspiration and connection</p>
-            <figure>
-                <h1><img src="./img/Logo.svg" alt="Logo">SkyDiary</h1>
-            </figure>
-            <div>
-                <p><img src="<?= htmlspecialchars($user['profile_picture']) ?>" alt="Photo de profil"> <?= htmlspecialchars($user['username']) ?></p>
-            </div>
-        </article>
-    </main>
+    <?php endif; ?>
+</main>
+</body>
+</html>
+
     <footer>
         <hr>
 

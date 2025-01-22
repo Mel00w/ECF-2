@@ -3,6 +3,7 @@ include_once './connexion.php';
 session_start();
 $id_user = $_SESSION['id_user'] ?? null;
 
+
 if (!$id_user) {
     echo "Vous devez être connecté pour supprimer un article.";
     exit;
@@ -22,14 +23,28 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
         exit;
     }
 
+
+
+$title = $bdd->prepare('SELECT `pic` FROM `post` WHERE `id_post` = :id');
+$title->bindValue(':id', $id, PDO::PARAM_INT);  
+$title->execute();
+$titre = $title->fetch(PDO::FETCH_ASSOC);
+// Supprime l'image
+foreach (glob($titre['pic']) as $existingFile) {
+    unlink($existingFile); // Delete the existing file
+}
+
+
     // Supprime l'article
     $req = $bdd->prepare('DELETE FROM post WHERE id_post = :id');
     $req->bindValue(':id', $id, PDO::PARAM_INT);
     $req->execute();
 
     echo "Article supprimé avec succès.";
-    header('Location: index.php');
+     header('Location: index.php');
+   exit;    
 } else {
     echo "ID invalide.";
 }
+
 ?>

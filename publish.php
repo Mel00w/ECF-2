@@ -20,83 +20,83 @@ $username = $isConnected ? $_SESSION['username'] : null; // Récupère le nom d'
 </head>
 
 <body>
-<header>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="./index.php">
-                <img src="./img/Logo.svg" alt="">SkyDiary
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <?php if ($isConnected): ?>
+    <header>
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid">
+                <a class="navbar-brand" href="./index.php">
+                    <img src="./img/Logo.svg" alt="">SkyDiary
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <?php if ($isConnected): ?>
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="./profile.php">
+                                    Welcome <?= htmlspecialchars($username) ?>
+                                </a>
+                            </li>
+                        <?php else: ?>
+                            <li class="nav-item">
+                                <a class="nav-link active" aria-current="page" href="./login.php">
+                                    Login/Register
+                                </a>
+                            </li>
+                        <?php endif; ?>
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="./profile.php">
-                                Welcome <?= htmlspecialchars($username) ?>
-                            </a>
+                            <a class="nav-link" href="./index.php">Home</a>
                         </li>
-                    <?php else: ?>
                         <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="./login.php">
-                                Login/Register
-                            </a>
+                            <a class="nav-link" href="./publish.php">Publish</a>
                         </li>
-                    <?php endif; ?>
-                    <li class="nav-item">
-                        <a class="nav-link" href="./index.php">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="./publish.php">Publish</a>
-                    </li>
-                    <?php if ($isConnected): ?>
-                        <li class="nav-item">
-                            <a class="nav-link" href="./disconnected.php">Disconnect</a>
-                        </li>
-                    <?php endif; ?>
-                </ul>
+                        <?php if ($isConnected): ?>
+                            <li class="nav-item">
+                                <a class="nav-link" href="./disconnected.php">Disconnect</a>
+                            </li>
+                        <?php endif; ?>
+                    </ul>
+                </div>
             </div>
-        </div>
-    </nav>
-</header>
-<main>  
-     <section>
-    <h2>Publish your article</h2>
- 
-        
-<?php if ($isConnected): ?>
-    <form action="submit_article.php" method="POST" enctype="multipart/form-data">
-        <div class="mb-3">
-            <label for="title" class="form-label">Title</label>
-            <input type="text" class="form-control" id="title" name="title" required>
-        </div>
-        <div class="mb-3">
-            <label for="under_title" class="form-label">Under Title</label>
-            <input type="text" class="form-control" id="under_title" name="under_title" required>
-        </div>
-        <div class="mb-3">
-            <label for="intro" class="form-label">Introduction</label>
-            <textarea class="form-control" id="intro" name="intro" rows="3" required></textarea>
-        </div>
-        <div class="mb-3">
-            <label for="contain" class="form-label">Content</label>
-            <textarea class="form-control" id="contain" name="contain" rows="5" required></textarea>
-        </div>
-        <div class="mb-3">
-    <label for="pic" class="form-label">Picture</label>
-    <input type="file" id="pic" name="pic" required>
-</div>
+        </nav>
+    </header>
+    <main>
+        <section>
+            <h2>Publish your article</h2>
 
-        <button type="submit" class="btn btn-primary">Publish</button>
-    </form> 
 
-<?php else: ?>
-    <p>Please <a href="./login.php">login</a> to publish an article.</p>
-<?php endif; ?> 
-</section>
-</main>
-<footer>
+            <?php if ($isConnected): ?>
+                <form action="submit_article.php" method="POST" enctype="multipart/form-data">
+                    <div class="mb-3">
+                        <label for="title" class="form-label">Title</label>
+                        <input type="text" class="form-control" id="title" name="title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="under_title" class="form-label">Under Title</label>
+                        <input type="text" class="form-control" id="under_title" name="under_title" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="intro" class="form-label">Introduction</label>
+                        <textarea class="form-control" id="intro" name="intro" rows="3" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="contain" class="form-label">Content</label>
+                        <textarea class="form-control" id="contain" name="contain" rows="5" required></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label for="pic" class="form-label">Picture</label>
+                        <input type="file" id="pic" name="pic" accept=".webp" required>
+                    </div>
+
+                    <button type="submit" class="btn btn-primary">Publish</button>
+                </form>
+
+            <?php else: ?>
+                <p>Please <a href="./login.php">login</a> to publish an article.</p>
+            <?php endif; ?>
+        </section>
+    </main>
+    <footer>
         <hr>
 
         <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
