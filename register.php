@@ -1,0 +1,125 @@
+<?php
+include_once './connexion.php';
+
+if ($_SERVER['REQUEST_METHOD'] === 'POST') {
+    // Récupérer les données du formulaire
+    $username = trim(htmlspecialchars($_POST['username']));
+    $email = trim(htmlspecialchars($_POST['email']));
+    $password = trim($_POST['password']);
+    $error = null;
+
+    // Vérifier si un fichier a été envoyé
+    if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === 0) {
+        // Vérification du type de fichier
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        $fileType = mime_content_type($_FILES['profile_picture']['tmp_name']);
+        
+        if (!in_array($fileType, $allowedTypes)) {
+            $error = "Le fichier doit être une image (JPEG, PNG ou GIF).";
+        } else {
+            // Définir le répertoire d'upload
+            $uploadDir = './img/'; // Répertoire où les images seront sauvegardées
+            if (!is_dir($uploadDir)) {
+                mkdir($uploadDir, 0755, true); // Crée le dossier si nécessaire
+            }
+
+            // Générer un nom unique pour le fichier
+            $fileName = uniqid() . '-' . basename($_FILES['profile_picture']['name']);
+            $filePath = $uploadDir . $fileName;
+
+            // Déplacer le fichier vers le dossier de destination
+            if (!move_uploaded_file($_FILES['profile_picture']['tmp_name'], $filePath)) {
+                $error = "Échec de l'enregistrement de la photo de profil.";
+            }
+        }
+    } else {
+        $filePath = null; // Aucun fichier envoyé
+    }
+
+    // Validation des champs
+    if (!$error) {
+        if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
+            $error = "L'adresse email est invalide.";
+        } elseif (strlen($password) < 6) {
+            $error = "Le mot de passe doit contenir au moins 6 caractères.";
+        } elseif (empty($username)) {
+            $error = "Le nom d'utilisateur ne peut pas être vide.";
+        } else {
+            // Vérifier si l'email existe déjà dans la base de données
+            $stmt = $bdd->prepare('SELECT COUNT(*) FROM `user` WHERE `email` = :email');
+            $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+            $stmt->execute();
+            $emailExists = $stmt->fetchColumn();
+
+            if ($emailExists) {
+                $error = "Cet email est déjà utilisé. Veuillez en choisir un autre.";
+            } else {
+                // Insérer l'utilisateur dans la base de données
+                $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
+                // Le chemin du fichier doit être relatif (img/monimage.png)
+                $stmt = $bdd->prepare('INSERT INTO `user` (`username`, `email`, `password`, `profile_picture`) VALUES (:username, :email, :password, :profile_picture)');
+                $stmt->bindParam(':username', $username, PDO::PARAM_STR);
+                $stmt->bindParam(':email', $email, PDO::PARAM_STR);
+                $stmt->bindParam(':password', $hashedPassword, PDO::PARAM_STR);
+                $stmt->bindParam(':profile_picture', $filePath, PDO::PARAM_STR);
+
+                if ($stmt->execute()) {
+                    // Redirection après succès
+                    header('Location: login.php');
+                    exit();
+                } else {
+                    $error = "Une erreur est survenue lors de l'inscription. Veuillez réessayer.";
+                }
+            }
+        }
+    }
+}
+?>
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
+    <title>SkyDiary | Inscription</title>
+    <style>
+        .profile-picture {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+        }
+    </style>
+</head>
+<body>
+    <div class="container mt-5">
+        <h1 class="mb-4">Inscrivez-vous à SkyDiary !</h1>
+        <?php if (!empty($error)) : ?>
+            <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+        <?php endif; ?>
+        <form action="register.php" method="post" enctype="multipart/form-data">
+            <div class="mb-3">
+                <label for="username" class="form-label">Nom d'utilisateur</label>
+                <input type="text" class="form-control" id="username" name="username" required>
+            </div>
+            <div class="mb-3">
+                <label for="email" class="form-label">Adresse email</label>
+                <input type="email" class="form-control" id="email" name="email" required>
+            </div>
+            <div class="mb-3">
+                <label for="password" class="form-label">Mot de passe</label>
+                <input type="password" class="form-control" id="password" name="password" required>
+            </div>
+            <div class="mb-3">
+                <label for="profile_picture" class="form-label">Photo de profil</label>
+                <input type="file" class="form-control" id="profile_picture" name="profile_picture" required>
+                <?php if (!empty($filePath)): ?>
+                    <img src="<?= htmlspecialchars($filePath) ?>" alt="Photo de profil" class="profile-picture mt-3">
+                <?php endif; ?>
+            </div>
+            <button type="submit" class="btn btn-primary">S'inscrire</button>
+        </form>
+        <p class="mt-3">Vous avez déjà un compte ? <a href="login.php">Connectez-vous ici</a>.</p>
+    </div>
+</body>
+</html>
