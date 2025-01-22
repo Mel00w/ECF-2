@@ -28,6 +28,7 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
     $req->execute();
 
     echo "Article supprimé avec succès.";
+    header('Location: index.php');
 } else {
     echo "ID invalide.";
 }
