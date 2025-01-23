@@ -1,5 +1,27 @@
-/*  ||  HOVER SOCIAL ICONS SVG  || */
-/*No need for JS if we don't set the fill attributes in html, we can manipulate it in CSS*/
+@import url('https://fonts.googleapis.com/css2?family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Source+Serif+4:ital,opsz,wght@0,8..60,200..900;1,8..60,200..900&display=swap');
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+}
+
+h2 {
+  text-transform: uppercase;
+}
 
 footer svg {
     fill:black;
@@ -12,3 +34,85 @@ footer svg {
     fill: #FFAE00;
   }
 
+.decor_txt {
+  font-size: 3rem;
+  margin-bottom: 50px;
+}
+
+.decor_txt span {
+  color: #A0A0A0;
+}
+
+.source-serif-4 {
+  font-family: "Source Serif 4", serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+
+.poppins-regular {
+  font-family: "Poppins", serif;
+  font-weight: 400;
+  font-style: normal;
+  color: #FFAE00;
+
+}
+
+.montserrat{
+  font-family: "Montserrat", serif;
+  font-optical-sizing: auto;
+  font-style: normal;
+}
+
+.montserrat-semi-bold {
+  font-family: "Montserrat", serif;
+  font-optical-sizing: auto;
+  font-weight: 600;
+  font-style: normal;
+}
+
+.pagination .page-link {
+  color: #FFAE00; /* Couleur du texte */
+  border-color: #ffae0000; /* Couleur de la bordure */
+  font-weight: 600;
+}
+
+.pagination .page-link:hover {
+  background-color: #FFAE00; /* Couleur de fond au survol */
+  color: white; /* Couleur du texte au survol */
+}
+
+.pagination .page-item.active .page-link {
+  background-color: #FFAE00; /* Couleur de fond de l'élément actif */
+  border-color: #ffae0000; /* Couleur de la bordure de l'élément actif */
+  color: white; /* Couleur du texte de l'élément actif */
+}
+
+.flex_raw {
+  display: flex;
+}
+
+.profile-pic-name {
+  font-size: 1rem;
+}
+
+.d-flex .align-items-center img {
+  margin: 500px;
+}
+
+form button[type="submit"] {
+  background-color: #FFAE00;
+  border: none;
+  color: white;
+}
+
+form button[type="submit"]:hover {
+  background-color: #e9bc5d;
+  border: none;
+  color: white;
+}
+
+.img-fluid-custom {
+  width: 100%;
+  height: 300px; 
+  object-fit: cover; 
+}

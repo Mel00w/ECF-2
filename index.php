@@ -1,120 +1,156 @@
 <?php
 session_start();
 include_once './connexion.php';
-$req = $bdd->query('SELECT post.`id_post`, post.`date_published`, post.`title`, post.`under_title`, post.`intro`, post.`contain`, post.`pic`, post.`id_user`, user.`id_user`, user.`username` , `user`.`profile_picture`, `user`.`password`, `user`.`email` FROM `post` INNER JOIN `user` ON post.`id_user` = user.`id_user` ORDER BY post.`date_published` DESC;');
-$user = $bdd->prepare('SELECT `id_user`, `username`, `profile_picture`, `email`, `password` FROM `user` WHERE `id_user`= :id;');
-$user->bindParam("id", $_SESSION['id_user'], PDO::PARAM_INT);
-$user->execute();
-$user = $user->fetch(PDO::FETCH_ASSOC);
-// Vérifier si un utilisateur est connecté
-$isConnected = isset($_SESSION['id_user']); // Vérifie si l'ID utilisateur est stocké dans la session
-$username = $isConnected ? $_SESSION['username'] : null; // Récupère le nom d'utilisateur de la session s'il est connecté
+
+// Définir le nombre d'articles à afficher par page
+$articlesPerPage = 5;
+
+// Récupérer le numéro de la page courante depuis l'URL, ou par défaut 1
+$page = isset($_GET['page']) ? (int)$_GET['page'] : 1;
+$page = max(1, $page); // S'assurer que le numéro de page est au moins 1
+
+// Calculer l'offset pour la requête SQL (décalage des résultats pour la pagination)
+$offset = ($page - 1) * $articlesPerPage;
+
+// Récupérer le nombre total d'articles dans la table "post"
+$totalArticlesQuery = $bdd->query('SELECT COUNT(*) AS total FROM `post`');
+$totalArticles = $totalArticlesQuery->fetch(PDO::FETCH_ASSOC)['total'];
+
+// Calculer le nombre total de pages nécessaires
+$totalPages = ceil($totalArticles / $articlesPerPage);
+
+// Récupérer les articles pour la page actuelle avec une requête préparée
+$req = $bdd->prepare(
+    'SELECT 
+        post.`id_post`, post.`date_published`, post.`title`, post.`under_title`, 
+        post.`intro`, post.`contain`, post.`pic`, post.`id_user`, 
+        user.`username`, user.`profile_picture` 
+     FROM `post`
+     INNER JOIN `user` ON post.`id_user` = user.`id_user`
+     ORDER BY post.`date_published` DESC
+     LIMIT :limit OFFSET :offset'
+);
+$req->bindValue(':limit', $articlesPerPage, PDO::PARAM_INT); // Limite des articles
+$req->bindValue(':offset', $offset, PDO::PARAM_INT); // Décalage pour la pagination
+$req->execute();
+
+// Si l'utilisateur est connecté, récupérer ses informations
+$isConnected = isset($_SESSION['id_user']);
+if ($isConnected) {
+    $user = $bdd->prepare('SELECT id_user, username, profile_picture, email FROM user WHERE id_user = :id');
+    $user->bindParam(':id', $_SESSION['id_user'], PDO::PARAM_INT);
+    $user->execute();
+    $user = $user->fetch(PDO::FETCH_ASSOC);
+    $username = $user['username'];
+} else {
+    $username = null;
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="fr">
 
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <title>SkyDiary | Home</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous">
     <link rel="stylesheet" href="./css/style.css">
     <meta name="description" content="SkyDiary est une plateforme de blog en ligne.">
 </head>
 
 <body>
-<header>
-    <nav class="navbar navbar-expand-lg bg-body-tertiary">
-        <div class="container-fluid">
-            <a class="navbar-brand" href="./index.php">
-                <img src="./img/Logo.svg" alt="">SkyDiary
-            </a>
-            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
-                <span class="navbar-toggler-icon"></span>
-            </button>
-            <div class="collapse navbar-collapse" id="navbarSupportedContent">
-                <ul class="navbar-nav me-auto mb-2 mb-lg-0">
-                    <?php if ($isConnected): ?>
-                    <li class="nav-item"></li>
-                        <a class="nav-link active" aria-current="page" href="./profile.php">
-                         
-                              <img src="<?= htmlspecialchars($user['profile_picture']) ?>" alt="Profile Picture" style="width: 30px; height: 30px; border-radius: 50%;">
-                                  <?= htmlspecialchars($username) ?>
+    <header>
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid container mt-4">
+                <a class="navbar-brand" href="./index.php">
+                    <img class="montserrat-semi-bold" src="./img/Logo.svg" alt="">SkyDiary
+                </a>
+                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent" aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
+                    <span class="navbar-toggler-icon"></span>
+                </button>
+                <div class="collapse navbar-collapse" id="navbarSupportedContent">
+                    <ul class="navbar-nav me-auto mb-2 mb-lg-0">
+                        <?php if ($isConnected): ?>
+                            <li class="nav-item">
+                                <a class="nav-link active" href="./profile.php">
+                                    <img src="<?= htmlspecialchars($user['profile_picture']) ?>" alt="Photo de profil" style="width: 30px; height: 30px; border-radius: 50%;">
+                                    <?= htmlspecialchars($username) ?>
+                                </a>
+                            </li>
+                        <?php else: ?>
+                            <li class="nav-item">
+                                <a class="nav-link active" href="./login.php">Login/Register</a>
+                            </li>
+                        <?php endif; ?>
+                        <li class="nav-item"><a class="nav-link" href="./index.php">Home</a></li>
+                        <li class="nav-item"><a class="nav-link" href="./publish.php">Publish</a></li>
+                        <?php if ($isConnected): ?>
+                            <li class="nav-item"><a class="nav-link" href="./disconnected.php">Disconnect</a></li>
+                        <?php endif; ?>
+                    </ul>
+                </div>
+            </div>
+        </nav>
+    </header>
+    <main class="container mt-4">
+        <?php if ($isConnected): ?>
+            <p class="decor_txt source-serif-4 text-center">Engage with ideas <span>that spark change and creativity. Stay informed on </span> what's shaping the world around you. <span> Discover the stories that </span> fuel inspiration and connection.</p>
+
+            <!-- Liste des articles -->
+            <div class="row d-flex flex-column align-items-center">
+                <?php while ($article = $req->fetch(PDO::FETCH_ASSOC)) { ?>
+                    <div class="col-md-8 mb-4">
+                        <a href="article.php?id=<?= $article['id_post'] ?>">
+                            <img src="<?= htmlspecialchars($article['pic']) ?>" alt="Photo de l'article" class="img-fluid rounded mx-auto d-block img-fluid-custom">
                         </a>
-                    </li>
-                    <?php else: ?>
-                        <li class="nav-item">
-                            <a class="nav-link active" aria-current="page" href="./login.php">
-                                Login/Register
-                            </a>
+                        <h2 class="source-serif-4 text-center"><?= htmlspecialchars($article['title']) ?></h2>
+                        <p class="poppins-regular text-center"><?= htmlspecialchars($article['date_published']) ?></p>
+                    </div>
+                <?php } ?>
+            </div>
+            <nav>
+                <ul class="pagination justify-content-center">
+                    <!-- Lien vers la page précédente -->
+                    <?php if ($page > 1): ?>
+                        <li class="page-item">
+                            <a class="page-link" href="?page=<?= $page - 1 ?>">Previous</a>
                         </li>
                     <?php endif; ?>
-                    <li class="nav-item">
-                        <a class="nav-link" href="./index.php">Home</a>
-                    </li>
-                    <li class="nav-item">
-                        <a class="nav-link" href="./publish.php">Publish</a>
-                    </li>
-                    <?php if ($isConnected): ?>
-                        <li class="nav-item">
-                            <a class="nav-link" href="./disconnected.php">Disconnect</a>
+
+                    <!-- Liens vers les pages -->
+                    <?php for ($i = 1; $i <= $totalPages; $i++): ?>
+                        <li class="page-item <?= $i == $page ? 'active' : '' ?>">
+                            <a class="page-link" href="?page=<?= $i ?>"><?= $i ?></a>
+                        </li>
+                    <?php endfor; ?>
+
+                    <!-- Lien vers la page suivante -->
+                    <?php if ($page < $totalPages): ?>
+                        <li class="page-item">
+                            <a class="page-link" href="?page=<?= $page + 1 ?>">Next</a>
                         </li>
                     <?php endif; ?>
                 </ul>
-            </div>
-        </div>
-    </nav>
-</header>
+            </nav>
 
-<main>
-    <?php if ($isConnected): ?>
-        <article>
-            <p>Engage with ideas that spark change and creativity. Stay informed on what's shaping the world around you. Discover the stories that fuel inspiration and connection</p>
-        </article>
-        <article>
-            <div>
-                <p><img src="<?= htmlspecialchars($user['profile_picture']) ?>" alt="Photo de profil"> <?= htmlspecialchars($user['username']) ?></p>
-            </div>
-            <?php
-            // Affichage des deux derniers articles
-            $counter = 0;
-            $latestPostsDisplayed = false;
-            while ($article = $req->fetch(PDO::FETCH_ASSOC)) {
-                if ($counter < 2) {
-            ?>
-                    <div>
-                        <a href="article.php?id=<?= $article['id_post'] ?>"><img src="<?= htmlspecialchars($article['pic']) ?>" alt="Photo de l'article"></a>
-                        <h2><?= htmlspecialchars($article['title']) ?></h2>
-                        <h3><?= htmlspecialchars($article['date_published']) ?></h3>
-                    </div>
-                    <?php
-                    $counter++;
-                } else {
-                    if (!$latestPostsDisplayed) {
-                    ?>
-                        <h2>Articles plus anciens</h2>
-                    <?php
-                        $latestPostsDisplayed = true; // Marque le H2 comme affiché
-                    }
-                    ?>
-                    <div>
-                        <a href="article.php?id=<?= $article['id_post'] ?>"><img src="<?= htmlspecialchars($article['pic']) ?>" alt="Photo de l'article"></a>
-                        <h2><?= htmlspecialchars($article['title']) ?></h2>
-                        <h3><?= htmlspecialchars($article['date_published']) ?></h3>
-                    </div>
-            <?php
-                }
-            }
-            ?>
-        </article>
-    <?php endif; ?>
-</main>
+    </main>
+
 </body>
+
 </html>
+<footer>
 
-    <footer>
-        <hr>
+    <article class="container mt-4">
+        <p class="decor_txt source-serif-4">Engage with ideas <span>that spark change and creativity. Stay informed on </span> what's shaping the world around you. <span> Discover the stories that
+            </span> fuel inspiration and connection.</p>
 
+        <figure>
+            <a class="navbar-brand montserrat-semi-bold" href="./index.php"><img src="./img/Logo.svg" alt="Logo">SkyDiary</a>
+        </figure>
+    </article>
+    <hr>
+    <div class="container mt-4">
         <svg width="48" height="48" viewBox="0 0 48 48" fill="none" xmlns="http://www.w3.org/2000/svg">
             <g clip-path="url(#clip0_17_63)">
                 <path d="M24 4.32187C30.4125 4.32187 31.1719 4.35 33.6938 4.4625C36.0375 4.56562 37.3031 4.95938 38.1469 5.2875C39.2625 5.71875 40.0688 6.24375 40.9031 7.07812C41.7469 7.92188 42.2625 8.71875 42.6938 9.83438C43.0219 10.6781 43.4156 11.9531 43.5188 14.2875C43.6313 16.8187 43.6594 17.5781 43.6594 23.9813C43.6594 30.3938 43.6313 31.1531 43.5188 33.675C43.4156 36.0188 43.0219 37.2844 42.6938 38.1281C42.2625 39.2438 41.7375 40.05 40.9031 40.8844C40.0594 41.7281 39.2625 42.2438 38.1469 42.675C37.3031 43.0031 36.0281 43.3969 33.6938 43.5C31.1625 43.6125 30.4031 43.6406 24 43.6406C17.5875 43.6406 16.8281 43.6125 14.3063 43.5C11.9625 43.3969 10.6969 43.0031 9.85313 42.675C8.7375 42.2438 7.93125 41.7188 7.09688 40.8844C6.25313 40.0406 5.7375 39.2438 5.30625 38.1281C4.97813 37.2844 4.58438 36.0094 4.48125 33.675C4.36875 31.1438 4.34063 30.3844 4.34063 23.9813C4.34063 17.5688 4.36875 16.8094 4.48125 14.2875C4.58438 11.9437 4.97813 10.6781 5.30625 9.83438C5.7375 8.71875 6.2625 7.9125 7.09688 7.07812C7.94063 6.23438 8.7375 5.71875 9.85313 5.2875C10.6969 4.95938 11.9719 4.56562 14.3063 4.4625C16.8281 4.35 17.5875 4.32187 24 4.32187ZM24 0C17.4844 0 16.6688 0.028125 14.1094 0.140625C11.5594 0.253125 9.80625 0.665625 8.2875 1.25625C6.70312 1.875 5.3625 2.69062 4.03125 4.03125C2.69063 5.3625 1.875 6.70313 1.25625 8.27813C0.665625 9.80625 0.253125 11.55 0.140625 14.1C0.028125 16.6687 0 17.4844 0 24C0 30.5156 0.028125 31.3312 0.140625 33.8906C0.253125 36.4406 0.665625 38.1938 1.25625 39.7125C1.875 41.2969 2.69063 42.6375 4.03125 43.9688C5.3625 45.3 6.70313 46.125 8.27813 46.7344C9.80625 47.325 11.55 47.7375 14.1 47.85C16.6594 47.9625 17.475 47.9906 23.9906 47.9906C30.5063 47.9906 31.3219 47.9625 33.8813 47.85C36.4313 47.7375 38.1844 47.325 39.7031 46.7344C41.2781 46.125 42.6188 45.3 43.95 43.9688C45.2812 42.6375 46.1063 41.2969 46.7156 39.7219C47.3063 38.1938 47.7188 36.45 47.8313 33.9C47.9438 31.3406 47.9719 30.525 47.9719 24.0094C47.9719 17.4938 47.9438 16.6781 47.8313 14.1188C47.7188 11.5688 47.3063 9.81563 46.7156 8.29688C46.125 6.70312 45.3094 5.3625 43.9688 4.03125C42.6375 2.7 41.2969 1.875 39.7219 1.26562C38.1938 0.675 36.45 0.2625 33.9 0.15C31.3313 0.028125 30.5156 0 24 0Z" fill="" />
@@ -146,10 +182,14 @@ $username = $isConnected ? $_SESSION['username'] : null; // Récupère le nom d'
         </svg>
         <p>© 2025 SkyDiary. All rights reserved.</p>
         <img src="./img/youtube.svg" alt="">
-    </footer>
+    </div>
+</footer>
+<?php else: ?>
+            <p class="text-center">Please <a href="./login.php">login</a> to publish an article.</p>
+        <?php endif; ?>
 
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-    <script src="./js/main.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+<script src="./js/main.js"></script>
 </body>
 
 </html>
