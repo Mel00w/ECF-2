@@ -57,9 +57,7 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
     <header>
         <nav class="navbar navbar-expand-lg bg-body-tertiary">
             <div class="container-fluid container mt-4">
-                <a class="navbar-brand" href="./index.php">
-                    <img src="./img/Logo.svg" alt="Logo">SkyDiary
-                </a>
+                <a class="navbar-brand" href="./index.php"><img src="./img/Logo.svg" alt="Logo">SkyDiary</a>
                 <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarSupportedContent">
                     <span class="navbar-toggler-icon"></span>
                 </button>
