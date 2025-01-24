@@ -13,7 +13,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Vérification du type de fichier
         $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
         $fileType = mime_content_type($_FILES['profile_picture']['tmp_name']);
-        
+
         if (!in_array($fileType, $allowedTypes)) {
             $error = "Le fichier doit être une image (JPEG, PNG ou GIF).";
         } else {
@@ -39,11 +39,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Validation des champs
     if (!$error) {
         if (!filter_var($email, FILTER_VALIDATE_EMAIL)) {
-            $error = "L'adresse email est invalide.";
+            $error = "The email address is invalid.";
         } elseif (strlen($password) < 6) {
-            $error = "Le mot de passe doit contenir au moins 6 caractères.";
+            $error = "The password must contain at least 6 characters.";
         } elseif (empty($username)) {
-            $error = "Le nom d'utilisateur ne peut pas être vide.";
+            $error = "Username cannot be empty.";
         } else {
             // Vérifier si l'email existe déjà dans la base de données
             $stmt = $bdd->prepare('SELECT COUNT(*) FROM `user` WHERE `email` = :email');
@@ -52,7 +52,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
             $emailExists = $stmt->fetchColumn();
 
             if ($emailExists) {
-                $error = "Cet email est déjà utilisé. Veuillez en choisir un autre.";
+                $error = "This email is already in use. Please choose another one.";
             } else {
                 // Insérer l'utilisateur dans la base de données
                 $hashedPassword = password_hash($password, PASSWORD_DEFAULT);
@@ -68,7 +68,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
                     header('Location: login.php');
                     exit();
                 } else {
-                    $error = "Une erreur est survenue lors de l'inscription. Veuillez réessayer.";
+                    $error = "An error occurred during registration. Please try again.";
                 }
             }
         }
@@ -78,19 +78,17 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="SkyDiary est une plateforme de blog en ligne.">
+    <title>SkyDiary | Register</title>
+    <link rel="icon" href="./img/Logo.svg">
+    <link rel="stylesheet" href="./css/style.css">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" rel="stylesheet">
-    <title>SkyDiary | Inscription</title>
-    <style>
-        .profile-picture {
-            width: 56px;
-            height: 56px;
-            border-radius: 50%;
-        }
-    </style>
 </head>
+
 <body>
     <div class="container mt-5">
         <h1 class="mb-4">Inscrivez-vous à SkyDiary !</h1>
@@ -122,4 +120,5 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         <p class="mt-3">Vous avez déjà un compte ? <a href="login.php">Connectez-vous ici</a>.</p>
     </div>
 </body>
+
 </html>
