@@ -25,6 +25,7 @@ $username = $isConnected ? $_SESSION['username'] : null;
     <title>SkyDiary | <?= $username; ?>'s profile </title>
     <link rel="icon" href="./img/Logo.svg">
     <link rel="stylesheet" href="./css/style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css" integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg==" crossorigin="anonymous" referrerpolicy="no-referrer" />
 </head>
 
 <body>
@@ -76,12 +77,12 @@ $username = $isConnected ? $_SESSION['username'] : null;
                 <img src="<?= htmlspecialchars($user['profile_picture']) ?>" alt="Photo de profil" class="mb-4 modify">
                 <input type="file" class="form-control" id="profile_picture" name="profile_picture">
             </div>
-            <button type="submit" class="btn btn-primary">Update Profile</button>
+            <button type="submit" class="btn btn-primary">Update Profile <i class="fa-solid fa-pen-nib"></i></button>
         </form>
 
         <!-- Formulaire de suppression de compte -->
         <form action="delete_account.php" method="POST" onsubmit="return confirm('Are you sure you want to delete your account? This action is irreversible.');">
-            <button type="submit" class="btn-danger mt-4">Delete My Account</button>
+            <button type="submit" class="btn-danger mt-4">Delete My Account <i class="fa-solid fa-trash"></i></button>
         </form>
     </main>
 
