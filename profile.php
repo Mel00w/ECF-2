@@ -1,14 +1,17 @@
 <?php
 session_start();
 include_once './connexion.php';
+
+// Requête pour récupérer les informations de l'utilisateur connecté
 $req = $bdd->query('SELECT post.`id_post`, post.`date_published`, post.`title`, post.`under_title`, post.`intro`, post.`contain`, post.`pic`, post.`id_user`, user.`id_user`, user.`username` , `user`.`profile_picture`, `user`.`password`, `user`.`email` FROM `post` INNER JOIN `user` ON post.`id_user` = user.`id_user`;');
 $user = $bdd->prepare('SELECT `id_user`, `username`, `profile_picture`, `email`, `password` FROM `user` WHERE `id_user`= :id;');
 $user->bindParam("id", $_SESSION['id_user'], PDO::PARAM_INT);
 $user->execute();
 $user = $user->fetch(PDO::FETCH_ASSOC);
+
 // Vérifier si un utilisateur est connecté
-$isConnected = isset($_SESSION['id_user']); // Vérifie si l'ID utilisateur est stocké dans la session
-$username = $isConnected ? $_SESSION['username'] : null; // Récupère le nom d'utilisateur de la session s'il est connecté
+$isConnected = isset($_SESSION['id_user']);
+$username = $isConnected ? $_SESSION['username'] : null;
 
 ?>
 <!DOCTYPE html>
@@ -59,20 +62,31 @@ $username = $isConnected ? $_SESSION['username'] : null; // Récupère le nom d'
             </div>
         </nav>
     </header>
+
     <main class="container mt-4">
         <h2 class="pagination justify-content-center source-serif-4">Modify My Profile 😊 </h2>
+        <!-- Formulaire de modification du profil -->
         <form action="update_profile.php" method="POST" enctype="multipart/form-data">
             <div class="mb-3">
                 <label for="username" class="form-label">Username</label>
                 <input type="text" class="form-control" id="username" name="username" value="<?= htmlspecialchars($user['username']) ?>" required>
             </div>
-            <div class="mb-3 ">
+            <div class="mb-3">
                 <label for="profile_picture" class="form-label">Profile Picture</label>
-                <img src="<?= htmlspecialchars($user['profile_picture']) ?>" alt="Photo de profil" class="mb-4">
+                <img src="<?= htmlspecialchars($user['profile_picture']) ?>" alt="Photo de profil" class="mb-4 modify">
                 <input type="file" class="form-control" id="profile_picture" name="profile_picture">
             </div>
             <button type="submit" class="btn btn-primary">Update Profile</button>
         </form>
 
+        <!-- Formulaire de suppression de compte -->
+        <form action="delete_account.php" method="POST" onsubmit="return confirm('Are you sure you want to delete your account? This action is irreversible.');">
+            <button type="submit" class="btn-danger mt-4">Delete My Account</button>
+        </form>
     </main>
+
     <?php include "./footer.php" ?>
+
+</body>
+
+</html>

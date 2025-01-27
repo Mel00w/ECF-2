@@ -11,11 +11,11 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     // Vérifier si un fichier a été envoyé
     if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === 0) {
         // Vérification du type de fichier
-        $allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+        $allowedTypes = ['image/jpeg', 'image/png', 'image/webp'];
         $fileType = mime_content_type($_FILES['profile_picture']['tmp_name']);
 
         if (!in_array($fileType, $allowedTypes)) {
-            $error = "Le fichier doit être une image (JPEG, PNG ou GIF).";
+            $error = "Le fichier doit être une image (JPEG, PNG ou webp).";
         } else {
             // Définir le répertoire d'upload
             $uploadDir = './img/'; // Répertoire où les images seront sauvegardées

@@ -141,3 +141,7 @@ form button[type="submit"] {
 .test {
   text-decoration: none;
 }
+
+.modify {
+  width: 50px;
+}
