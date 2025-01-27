@@ -14,7 +14,7 @@ $id_user = $_SESSION['id_user'];
 // Traite les données du formulaire
 if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     $username = htmlspecialchars($_POST['username']);
-    
+
     // Gère le téléchargement de l'image de profil
     if (isset($_FILES['profile_picture']) && $_FILES['profile_picture']['error'] === 0) {
         $upload_dir = 'uploads/';
@@ -32,7 +32,7 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         // Si aucune nouvelle image n'est téléchargée, garde l'ancienne
         $profile_picture = $bdd->query('SELECT profile_picture FROM user WHERE id_user = ' . $id_user)->fetchColumn();
     }
-    
+
     // Met à jour les informations de profil dans la base de données
     $stmt = $bdd->prepare('UPDATE user SET username = ?, profile_picture = ? WHERE id_user = ?');
     $stmt->execute([$username, $profile_picture, $id_user]);
@@ -41,4 +41,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Location: profile.php');
     exit();
 }
-?>

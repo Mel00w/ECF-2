@@ -127,3 +127,17 @@ form button[type="submit"] {
   border: none;
   color: white;
 }
+
+.zoom-out-container {
+  position: relative;
+}
+.zoom-out-container img {
+  transition: transform 0.5s;
+}
+.zoom-out-container:hover img {
+  transform: scale(0.9);
+}
+
+.test {
+  text-decoration: none;
+}

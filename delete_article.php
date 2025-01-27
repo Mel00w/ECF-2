@@ -25,14 +25,14 @@ if (isset($_GET['id']) && is_numeric($_GET['id'])) {
 
 
 
-$title = $bdd->prepare('SELECT `pic` FROM `post` WHERE `id_post` = :id');
-$title->bindValue(':id', $id, PDO::PARAM_INT);  
-$title->execute();
-$titre = $title->fetch(PDO::FETCH_ASSOC);
-// Supprime l'image
-foreach (glob($titre['pic']) as $existingFile) {
-    unlink($existingFile); // Delete the existing file
-}
+    $title = $bdd->prepare('SELECT `pic` FROM `post` WHERE `id_post` = :id');
+    $title->bindValue(':id', $id, PDO::PARAM_INT);
+    $title->execute();
+    $titre = $title->fetch(PDO::FETCH_ASSOC);
+    // Supprime l'image
+    foreach (glob($titre['pic']) as $existingFile) {
+        unlink($existingFile); // Delete the existing file
+    }
 
 
     // Supprime l'article
@@ -41,10 +41,8 @@ foreach (glob($titre['pic']) as $existingFile) {
     $req->execute();
 
     echo "Article supprimé avec succès.";
-     header('Location: index.php');
-   exit;    
+    header('Location: index.php');
+    exit;
 } else {
     echo "ID invalide.";
 }
-
-?>

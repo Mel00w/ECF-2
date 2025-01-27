@@ -90,35 +90,46 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
 </head>
 
 <body>
-    <div class="container mt-5">
-        <h1 class="mb-4">Inscrivez-vous à SkyDiary !</h1>
-        <?php if (!empty($error)) : ?>
-            <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
-        <?php endif; ?>
-        <form action="register.php" method="post" enctype="multipart/form-data">
-            <div class="mb-3">
-                <label for="username" class="form-label">Nom d'utilisateur</label>
-                <input type="text" class="form-control" id="username" name="username" required>
+    <header>
+        <nav class="navbar navbar-expand-lg bg-body-tertiary">
+            <div class="container-fluid container mt-4">
+                <a class="navbar-brand" href="./index.php">
+                    <img class="montserrat-semi-bold" src="./img/Logo.svg" alt="">SkyDiary
+                </a>
+                </ul>
             </div>
-            <div class="mb-3">
-                <label for="email" class="form-label">Adresse email</label>
-                <input type="email" class="form-control" id="email" name="email" required>
             </div>
-            <div class="mb-3">
-                <label for="password" class="form-label">Mot de passe</label>
-                <input type="password" class="form-control" id="password" name="password" required>
-            </div>
-            <div class="mb-3">
-                <label for="profile_picture" class="form-label">Photo de profil</label>
-                <input type="file" class="form-control" id="profile_picture" name="profile_picture" required>
-                <?php if (!empty($filePath)): ?>
-                    <img src="<?= htmlspecialchars($filePath) ?>" alt="Photo de profil" class="profile-picture mt-3">
-                <?php endif; ?>
-            </div>
-            <button type="submit" class="btn btn-primary">S'inscrire</button>
-        </form>
-        <p class="mt-3">Vous avez déjà un compte ? <a href="login.php">Connectez-vous ici</a>.</p>
-    </div>
-</body>
-
-</html>
+        </nav>
+    </header>
+    <main>
+        <div class="container mt-5">
+            <h1 class="mb-4">Subscribe to SkyDiary!</h1>
+            <?php if (!empty($error)) : ?>
+                <div class="alert alert-danger"><?= htmlspecialchars($error) ?></div>
+            <?php endif; ?>
+            <form action="register.php" method="post" enctype="multipart/form-data">
+                <div class="mb-3">
+                    <label for="username" class="form-label">Username</label>
+                    <input type="text" class="form-control" id="username" name="username" required>
+                </div>
+                <div class="mb-3">
+                    <label for="email" class="form-label">E-mail</label>
+                    <input type="email" class="form-control" id="email" name="email" required>
+                </div>
+                <div class="mb-3">
+                    <label for="password" class="form-label">Password</label>
+                    <input type="password" class="form-control" id="password" name="password" required>
+                </div>
+                <div class="mb-3">
+                    <label for="profile_picture" class="form-label">Profile picture</label>
+                    <input type="file" class="form-control" id="profile_picture" name="profile_picture" required>
+                    <?php if (!empty($filePath)): ?>
+                        <img src="<?= htmlspecialchars($filePath) ?>" alt="Photo de profil" class="profile-picture mt-3">
+                    <?php endif; ?>
+                </div>
+                <button type="submit" class="btn btn-primary">Register</button>
+            </form>
+            <p class="mt-3">Already have an account? <a href="login.php">Log in here</a>.</p>
+        </div>
+    </main>
+    <?php include "./footer.php" ?>

@@ -71,4 +71,3 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
     header('Location: article.php?id=' . $article_id);
     exit;
 }
-
